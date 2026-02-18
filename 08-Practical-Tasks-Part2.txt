@@ -1,0 +1,596 @@
+        <button
+          onClick={addTask}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "16px"
+          }}
+        >
+          Добавить
+        </button>
+      </div>
+      
+      {/* Статистика */}
+      <div style={{
+        padding: "10px",
+        backgroundColor: "#e9ecef",
+        borderRadius: "4px",
+        marginBottom: "20px"
+      }}>
+        <p>
+          Всего задач: {tasks.length} | 
+          Выполнено: {completedCount} | 
+          Осталось: {tasks.length - completedCount}
+        </p>
+      </div>
+      
+      {/* Список задач */}
+      {tasks.length === 0 ? (
+        <p style={{ textAlign: "center", color: "#999" }}>
+          Нет задач. Добавьте новую!
+        </p>
+      ) : (
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {tasks.map(task => (
+            <li
+              key={task.id}
+              style={{
+                padding: "15px",
+                backgroundColor: "#f0f0f0",
+                marginBottom: "10px",
+                borderRadius: "4px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              {/* Чекбокс */}
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => toggleTask(task.id)}
+                style={{ width: "20px", height: "20px", cursor: "pointer" }}
+              />
+              
+              {/* Текст задачи */}
+              <span
+                style={{
+                  flex: 1,
+                  textDecoration: task.completed ? "line-through" : "none",
+                  color: task.completed ? "#999" : "#333"
+                }}
+              >
+                {task.text}
+              </span>
+              
+              {/* Кнопка удаления */}
+              <button
+                onClick={() => deleteTask(task.id)}
+                style={{
+                  padding: "5px 10px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
+              >
+                Удалить
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. tasks массив хранит все задачи с id, text и completed
+2. addTask создает новую задачу с Date.now() как уникальный ID
+3. deleteTask удаляет задачу по ID (используя filter)
+4. toggleTask меняет статус выполнения (используя map)
+5. completedCount подсчитывает выполненные задачи
+6. onKeyPress позволяет добавить задачу нажатием Enter
+7. Условный рендеринг: если нет задач, показываем сообщение
+
+================================================================================
+
+ЗАДАЧА 6: Калькулятор
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать простой калькулятор с:
+• Дисплей для отображения результата
+• Кнопки для цифр (0-9)
+• Кнопки для операций (+, -, *, /)
+• Кнопка "=" для вычисления результата
+• Кнопка "Очистить" для сброса
+
+РЕШЕНИЕ:
+
+function Calculator() {
+  const [display, setDisplay] = useState("0");
+  const [previousValue, setPreviousValue] = useState(null);
+  const [operation, setOperation] = useState(null);
+  
+  // Обработать нажатие цифры
+  const handleNumber = (num) => {
+    if (display === "0") {
+      setDisplay(String(num));
+    } else {
+      setDisplay(display + num);
+    }
+  };
+  
+  // Обработать операцию
+  const handleOperation = (op) => {
+    const currentValue = parseFloat(display);
+    
+    if (previousValue === null) {
+      setPreviousValue(currentValue);
+    } else if (operation) {
+      // Вычислить результат предыдущей операции
+      const result = calculate(previousValue, currentValue, operation);
+      setDisplay(String(result));
+      setPreviousValue(result);
+    }
+    
+    setOperation(op);
+    setDisplay("0");
+  };
+  
+  // Вычислить результат
+  const calculate = (prev, current, op) => {
+    switch (op) {
+      case "+":
+        return prev + current;
+      case "-":
+        return prev - current;
+      case "*":
+        return prev * current;
+      case "/":
+        return current !== 0 ? prev / current : 0;
+      default:
+        return current;
+    }
+  };
+  
+  // Нажата кнопка =
+  const handleEquals = () => {
+    if (operation && previousValue !== null) {
+      const currentValue = parseFloat(display);
+      const result = calculate(previousValue, currentValue, operation);
+      setDisplay(String(result));
+      setPreviousValue(null);
+      setOperation(null);
+    }
+  };
+  
+  // Очистить
+  const handleClear = () => {
+    setDisplay("0");
+    setPreviousValue(null);
+    setOperation(null);
+  };
+  
+  const Button = ({ label, onClick, style }) => (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "15px 20px",
+        fontSize: "18px",
+        border: "1px solid #ccc",
+        borderRadius: "4px",
+        cursor: "pointer",
+        ...style
+      }}
+    >
+      {label}
+    </button>
+  );
+  
+  return (
+    <div style={{
+      maxWidth: "300px",
+      margin: "50px auto",
+      padding: "20px",
+      border: "2px solid #333",
+      borderRadius: "8px",
+      backgroundColor: "#f5f5f5"
+    }}>
+      <h2 style={{ textAlign: "center" }}>Калькулятор</h2>
+      
+      {/* Дисплей */}
+      <div style={{
+        backgroundColor: "black",
+        color: "#0f0",
+        fontSize: "32px",
+        padding: "20px",
+        textAlign: "right",
+        marginBottom: "20px",
+        borderRadius: "4px",
+        minHeight: "50px",
+        overflow: "hidden"
+      }}>
+        {display}
+      </div>
+      
+      {/* Кнопки */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px" }}>
+        <Button
+          label="C"
+          onClick={handleClear}
+          style={{ gridColumn: "1 / 3", backgroundColor: "#ff6b6b", color: "white" }}
+        />
+        <Button
+          label="/"
+          onClick={() => handleOperation("/")}
+          style={{ backgroundColor: "#ffa500", color: "white" }}
+        />
+        <Button
+          label="*"
+          onClick={() => handleOperation("*")}
+          style={{ backgroundColor: "#ffa500", color: "white" }}
+        />
+        
+        {[7, 8, 9].map(num => (
+          <Button
+            key={num}
+            label={num}
+            onClick={() => handleNumber(num)}
+          />
+        ))}
+        <Button
+          label="-"
+          onClick={() => handleOperation("-")}
+          style={{ backgroundColor: "#ffa500", color: "white" }}
+        />
+        
+        {[4, 5, 6].map(num => (
+          <Button
+            key={num}
+            label={num}
+            onClick={() => handleNumber(num)}
+          />
+        ))}
+        <Button
+          label="+"
+          onClick={() => handleOperation("+")}
+          style={{ gridRow: "4 / 6", backgroundColor: "#ffa500", color: "white" }}
+        />
+        
+        {[1, 2, 3].map(num => (
+          <Button
+            key={num}
+            label={num}
+            onClick={() => handleNumber(num)}
+          />
+        ))}
+        
+        <Button
+          label="0"
+          onClick={() => handleNumber(0)}
+          style={{ gridColumn: "1 / 3" }}
+        />
+        <Button
+          label="."
+          onClick={() => {
+            if (!display.includes(".")) {
+              setDisplay(display + ".");
+            }
+          }}
+        />
+        <Button
+          label="="
+          onClick={handleEquals}
+          style={{ backgroundColor: "#51cf66", color: "white" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. display хранит текущий вводимый номер
+2. previousValue хранит первое число операции
+3. operation хранит текущую операцию (+, -, *, /)
+4. handleNumber добавляет цифру к дисплею
+5. handleOperation сохраняет операцию и первое число
+6. calculate выполняет математическую операцию
+7. handleEquals вычисляет результат и показывает его
+8. Button компонент для кнопок
+
+================================================================================
+
+ЗАДАЧА 7: Угадай число (игра)
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать игру где:
+• Компьютер загадывает число от 1 до 100
+• Пользователь должен угадать число
+• После каждой попытки подсказка "Слишком мало" или "Слишком много"
+• Подсчет количества попыток
+• Кнопка для начала новой игры
+
+РЕШЕНИЕ:
+
+function GuessTheNumber() {
+  const [targetNumber, setTargetNumber] = useState(
+    Math.floor(Math.random() * 100) + 1
+  );
+  const [guess, setGuess] = useState("");
+  const [message, setMessage] = useState("Угадайте число от 1 до 100");
+  const [attempts, setAttempts] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  
+  const handleGuess = () => {
+    const number = parseInt(guess);
+    
+    if (isNaN(number)) {
+      setMessage("Пожалуйста, введите число");
+      return;
+    }
+    
+    if (number < 1 || number > 100) {
+      setMessage("Число должно быть от 1 до 100");
+      return;
+    }
+    
+    setAttempts(attempts + 1);
+    
+    if (number === targetNumber) {
+      setMessage(`🎉 Правильно! Вы угадали за ${attempts + 1} попыток`);
+      setGameOver(true);
+    } else if (number < targetNumber) {
+      setMessage("📈 Слишком мало");
+    } else {
+      setMessage("📉 Слишком много");
+    }
+    
+    setGuess("");
+  };
+  
+  const restartGame = () => {
+    setTargetNumber(Math.floor(Math.random() * 100) + 1);
+    setGuess("");
+    setMessage("Угадайте число от 1 до 100");
+    setAttempts(0);
+    setGameOver(false);
+  };
+  
+  return (
+    <div style={{
+      maxWidth: "400px",
+      margin: "50px auto",
+      padding: "30px",
+      backgroundColor: "#f0f0f0",
+      borderRadius: "8px",
+      textAlign: "center"
+    }}>
+      <h1>Угадай число</h1>
+      
+      <div style={{
+        fontSize: "20px",
+        marginBottom: "20px",
+        fontWeight: "bold",
+        color: gameOver ? "#28a745" : "#007bff"
+      }}>
+        {message}
+      </div>
+      
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="number"
+          value={guess}
+          onChange={(e) => setGuess(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") handleGuess();
+          }}
+          placeholder="Введите число..."
+          disabled={gameOver}
+          style={{
+            width: "100%",
+            padding: "10px",
+            fontSize: "16px",
+            marginBottom: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "4px"
+          }}
+        />
+      </div>
+      
+      <div style={{ display: "flex", gap: "10px" }}>
+        <button
+          onClick={handleGuess}
+          disabled={gameOver}
+          style={{
+            flex: 1,
+            padding: "10px",
+            fontSize: "16px",
+            backgroundColor: gameOver ? "#ccc" : "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: gameOver ? "default" : "pointer"
+          }}
+        >
+          Проверить
+        </button>
+        
+        <button
+          onClick={restartGame}
+          style={{
+            flex: 1,
+            padding: "10px",
+            fontSize: "16px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Новая игра
+        </button>
+      </div>
+      
+      <div style={{ marginTop: "20px", color: "#666" }}>
+        <p>Попыток: {attempts}</p>
+      </div>
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. targetNumber - загаданное число (генерируется Math.random())
+2. guess - текущее предположение пользователя
+3. handleGuess проверяет предположение и показывает подсказку
+4. attempts подсчитывает попытки
+5. gameOver предотвращает дальнейшие попытки после победы
+6. restartGame начинает новую игру
+
+================================================================================
+
+АЛГОРИТМ 1: Бинарный поиск
+────────────────────────────────────────────────────────────────────────────────
+
+Задача: Найти элемент в отсортированном массиве эффективно.
+
+function binarySearch(arr, target) {
+  let left = 0;
+  let right = arr.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (arr[mid] === target) {
+      return mid;  // найдено
+    } else if (arr[mid] < target) {
+      left = mid + 1;  // ищем справа
+    } else {
+      right = mid - 1;  // ищем слева
+    }
+  }
+  
+  return -1;  // не найдено
+}
+
+// Пример:
+const numbers = [1, 3, 5, 7, 9, 11, 13, 15];
+console.log(binarySearch(numbers, 7));   // 3
+console.log(binarySearch(numbers, 6));   // -1
+
+Сложность: O(log n) - очень быстро!
+
+================================================================================
+
+АЛГОРИТМ 2: Сортировка пузырьком (Bubble Sort)
+────────────────────────────────────────────────────────────────────────────────
+
+function bubbleSort(arr) {
+  const n = arr.length;
+  
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        // Меняем местами
+        let temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+  
+  return arr;
+}
+
+// Пример:
+console.log(bubbleSort([64, 34, 25, 12, 22, 11, 90]));
+// [11, 12, 22, 25, 34, 64, 90]
+
+Сложность: O(n²) - медленная, но просто понять
+
+================================================================================
+
+АЛГОРИТМ 3: Поиск максимального элемента
+────────────────────────────────────────────────────────────────────────────────
+
+function findMax(arr) {
+  let max = arr[0];
+  
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] > max) {
+      max = arr[i];
+    }
+  }
+  
+  return max;
+}
+
+// Пример:
+console.log(findMax([3, 7, 2, 9, 1]));  // 9
+
+Сложность: O(n)
+
+================================================================================
+
+АЛГОРИТМ 4: Палиндром (проверить, читается ли слово одинаково в обе стороны)
+────────────────────────────────────────────────────────────────────────────────
+
+function isPalindrome(str) {
+  // Удаляем пробелы и приводим к нижнему регистру
+  const cleaned = str.toLowerCase().replace(/\s/g, "");
+  
+  // Сравниваем со строкой в обратном порядке
+  return cleaned === cleaned.split("").reverse().join("");
+}
+
+// Примеры:
+console.log(isPalindrome("racecar"));        // true
+console.log(isPalindrome("hello"));          // false
+console.log(isPalindrome("A man a plan a canal Panama"));  // true
+
+Сложность: O(n)
+
+================================================================================
+
+АЛГОРИТМ 5: FizzBuzz (классическая задача)
+────────────────────────────────────────────────────────────────────────────────
+
+Задача: Вывести числа от 1 до n, но:
+- Если число делится на 3, вывести "Fizz"
+- Если число делится на 5, вывести "Buzz"
+- Если на 3 и 5, вывести "FizzBuzz"
+- Иначе вывести само число
+
+function fizzBuzz(n) {
+  for (let i = 1; i <= n; i++) {
+    if (i % 15 === 0) {
+      console.log("FizzBuzz");
+    } else if (i % 3 === 0) {
+      console.log("Fizz");
+    } else if (i % 5 === 0) {
+      console.log("Buzz");
+    } else {
+      console.log(i);
+    }
+  }
+}
+
+// Пример:
+fizzBuzz(15);
+// Результат:
+// 1, 2, Fizz, 4, Buzz, Fizz, 7, 8, Fizz, Buzz, 11, Fizz, 13, 14, FizzBuzz
+
+================================================================================

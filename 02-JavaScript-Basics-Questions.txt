@@ -1,0 +1,889 @@
+================================================================================
+РАЗДЕЛ 2: JAVASCRIPT ОСНОВЫ
+================================================================================
+
+ВОПРОС 1: Какие типы данных есть в JavaScript?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+В JavaScript есть 8 основных типов данных. Их делят на две категории:
+примитивные типы и объекты.
+
+ПРИМИТИВНЫЕ ТИПЫ (7 типов):
+
+1. NUMBER (число) - целые и дробные числа
+
+Примеры:
+let age = 25;           // целое число
+let price = 99.99;      // дробное число
+let negative = -42;     // отрицательное число
+let infinity = Infinity; // бесконечность
+let nan = NaN;          // Not a Number (специальное значение ошибки)
+
+Особенности:
+• JavaScript хранит все числа как 64-битные значения
+• NaN - это значение, которое возвращается при математических ошибках
+• Infinity - это бесконечность
+
+let result = 10 / 0;    // результат: Infinity
+let error = "text" * 2; // результат: NaN
+
+2. STRING (строка) - текст
+
+Примеры:
+let name = "Иван";           // двойные кавычки
+let message = 'Привет';      // одинарные кавычки
+let template = `Привет, ${name}`; // обратные кавычки (template strings)
+
+Особенности:
+• Строки неизменяемы (immutable)
+• Двойные, одинарные кавычки и обратные кавычки равноценны
+• Обратные кавычки позволяют вставлять переменные через ${...}
+
+let greeting = `Мне ${age} лет`;  // результат: "Мне 25 лет"
+
+3. BOOLEAN (логический тип) - true или false
+
+Примеры:
+let isActive = true;
+let isEmpty = false;
+let result = 10 > 5;    // true
+let result2 = 10 < 5;   // false
+
+Используется в условиях:
+if (isActive) {
+  console.log("Пользователь активен");
+}
+
+4. UNDEFINED (неопределенность)
+
+Это значение, которое автоматически присваивается переменной, если ей
+не присвоено никакого значения.
+
+Примеры:
+let x;                   // x содержит undefined
+console.log(x);          // выведет: undefined
+
+function test() {
+  // если нет return, функция вернет undefined
+}
+
+let result = test();     // result содержит undefined
+
+5. NULL (ничто)
+
+Это значение, которое вы явно присваиваете переменной, когда хотите сказать:
+"тут ничего".
+
+Примеры:
+let user = null;         // нет пользователя
+let data = null;         // нет данных
+
+Отличие от undefined:
+• undefined - "не присвоено"
+• null - "присвоено ничто"
+
+typeof undefined  // "undefined"
+typeof null       // "object" (это ошибка в JavaScript!)
+
+6. SYMBOL (символ) - редко используется
+
+Это уникальные значения, которые не повторяются. Используются в 
+продвинутом JavaScript.
+
+Примеры:
+let id = Symbol("id");
+let id2 = Symbol("id");
+
+id === id2  // false, они разные, хотя описаны одинаково
+
+7. BIGINT (большое целое число) - для очень больших чисел
+
+Обычные числа в JavaScript могут быть точны только до 9007199254740991.
+Для больших чисел используется BigInt.
+
+Примеры:
+let big = 9007199254740992n;  // буква 'n' в конце означает BigInt
+let huge = BigInt("9007199254740992");
+
+ОБЪЕКТЫ (ссылочный тип):
+
+Все остальное в JavaScript - это объект. Объекты - это сложные типы данных,
+которые могут содержать другие значения.
+
+Примеры объектов:
+let person = { name: "Иван", age: 25 };  // Object
+let numbers = [1, 2, 3];                  // Array
+function hello() { }                       // Function
+let date = new Date();                     // Date
+let regex = /pattern/;                     // RegExp
+
+ТАБЛИЦА ТИПОВ ДАННЫХ:
+
+┌──────────┬────────────────────┬──────────────────┐
+│ Тип      │ Пример             │ typeof           │
+├──────────┼────────────────────┼──────────────────┤
+│ Number   │ 42, 3.14, NaN      │ "number"         │
+│ String   │ "hello", 'привет'  │ "string"         │
+│ Boolean  │ true, false        │ "boolean"        │
+│ Undefined│ undefined          │ "undefined"      │
+│ Null     │ null               │ "object" (!!)    │
+│ Symbol   │ Symbol("id")       │ "symbol"         │
+│ BigInt   │ 42n                │ "bigint"         │
+│ Object   │ {}, [], function() │ "object"/"funct" │
+└──────────┴────────────────────┴──────────────────┘
+
+ПРОВЕРКА ТИПА:
+
+Используйте оператор typeof для определения типа:
+
+typeof 42              // "number"
+typeof "hello"         // "string"
+typeof true            // "boolean"
+typeof undefined       // "undefined"
+typeof null            // "object" (это ошибка!)
+typeof Symbol("id")    // "symbol"
+typeof 42n             // "bigint"
+typeof {}              // "object"
+typeof []              // "object"
+typeof function(){}    // "function"
+
+Для проверки null используйте:
+if (value === null) { ... }
+
+А не:
+if (typeof value === "object") { ... } // может быть и null!
+
+================================================================================
+
+ВОПРОС 2: Что такое замыкание (closure) и как оно работает?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+Замыкание - это функция, которая "помнит" переменные из того места, где она
+была создана, даже если эта функция вызывается в другом месте программы.
+
+Другими словами, замыкание дает функции доступ к переменным из области видимости,
+в которой функция была определена.
+
+ПРИМЕР 1: Простое замыкание
+
+function outer() {
+  let count = 0;  // переменная в функции outer
+  
+  function inner() {
+    count++;      // inner "помнит" про count
+    console.log(count);
+  }
+  
+  return inner;   // возвращаем функцию inner
+}
+
+let counter = outer();
+counter();  // 1
+counter();  // 2
+counter();  // 3
+
+ОБЪЯСНЕНИЕ:
+
+1. Мы создаем функцию outer, которая содержит переменную count
+2. Внутри outer есть функция inner, которая может использовать count
+3. Мы возвращаем функцию inner из outer
+4. Когда мы вызываем counter() несколько раз, count остается в памяти
+5. Переменная count изолирована - ее не видно из глобальной области
+
+Обычно, когда функция outer заканчивает работу, ее переменные удаляются из памяти.
+Но благодаря замыканию, переменная count остается в памяти, потому что функция
+inner ее использует.
+
+ПРИМЕР 2: Фабрика функций
+
+function createMultiplier(multiplier) {
+  return function(number) {
+    return number * multiplier;
+  };
+}
+
+let double = createMultiplier(2);
+let triple = createMultiplier(3);
+
+console.log(double(5));   // 10 (5 * 2)
+console.log(triple(5));   // 15 (5 * 3)
+
+ОБЪЯСНЕНИЕ:
+
+Функция createMultiplier создает и возвращает новую функцию.
+Эта новая функция "помнит" значение параметра multiplier.
+У double и triple разные значения multiplier (2 и 3), поэтому они работают по-разному.
+
+ПРИМЕР 3: Приватные переменные (инкапсуляция)
+
+function createBankAccount(initialBalance) {
+  let balance = initialBalance;  // приватная переменная
+  
+  return {
+    deposit: function(amount) {
+      balance += amount;
+      return balance;
+    },
+    withdraw: function(amount) {
+      if (amount <= balance) {
+        balance -= amount;
+        return balance;
+      }
+      return "Недостаточно средств";
+    },
+    getBalance: function() {
+      return balance;
+    }
+  };
+}
+
+let account = createBankAccount(1000);
+account.deposit(500);       // 1500
+account.withdraw(200);      // 1300
+account.getBalance();       // 1300
+account.balance = 999999;   // это не сработает!
+account.getBalance();       // 1300 (переменная защищена)
+
+ОБЪЯСНЕНИЕ:
+
+Переменная balance недоступна напрямую извне. Единственный способ к ней обратиться -
+через методы deposit, withdraw и getBalance. Это называется инкапсуляция.
+
+ПРИМЕР 4: Замыкания в циклах (частая ошибка)
+
+НЕПРАВИЛЬНО:
+var buttons = document.querySelectorAll("button");
+
+for (var i = 0; i < buttons.length; i++) {
+  buttons[i].addEventListener("click", function() {
+    console.log("Нажата кнопка " + i);  // всегда выведет последний i!
+  });
+}
+
+// При клике на любую кнопку выведет "Нажата кнопка 3"
+
+ПОЧЕМУ ЭТО НЕПРАВИЛЬНО:
+
+var создает переменную в области видимости функции.
+К моменту клика цикл уже закончился и i = 3.
+Все функции обработчиков "помнят" одну и ту же переменную i со значением 3.
+
+ПРАВИЛЬНОЕ РЕШЕНИЕ 1: Использовать let
+
+let buttons = document.querySelectorAll("button");
+
+for (let i = 0; i < buttons.length; i++) {
+  buttons[i].addEventListener("click", function() {
+    console.log("Нажата кнопка " + i);  // работает правильно!
+  });
+}
+
+let создает отдельную переменную i для каждой итерации цикла.
+Каждая функция-обработчик получает свою копию i.
+
+ПРАВИЛЬНОЕ РЕШЕНИЕ 2: Создать замыкание явно
+
+var buttons = document.querySelectorAll("button");
+
+for (var i = 0; i < buttons.length; i++) {
+  (function(index) {
+    buttons[index].addEventListener("click", function() {
+      console.log("Нажата кнопка " + index);  // работает правильно!
+    });
+  })(i);  // передаем i как параметр
+}
+
+Мы оборачиваем код в IIFE (самовызывающаяся функция) и передаем i как параметр.
+Каждый вызов IIFE создает новую область видимости с собственной переменной index.
+
+КОГДА ИСПОЛЬЗУЮТСЯ ЗАМЫКАНИЯ:
+
+1. Создание приватных переменных (примеры выше)
+2. Функции-обработчики событий
+3. Асинхронный код (колбеки, промисы, async/await)
+4. Создание модулей
+5. Функции высшего порядка (HOC в React)
+
+ПРОИЗВОДИТЕЛЬНОСТЬ:
+
+Будьте осторожны с замыканиями, если создаете их много.
+Каждое замыкание сохраняет ссылку на переменные, поэтому они не удаляются
+из памяти сборщиком мусора.
+
+Если вам не нужна переменная, удалите ссылку на нее:
+
+function createClosure() {
+  let largeData = new Array(1000000); // большой объект
+  
+  return function() {
+    // largeData больше не нужна после инициализации
+    largeData = null;  // помогаем сборщику мусора
+    return "done";
+  };
+}
+
+================================================================================
+
+ВОПРОС 3: Что такое this в JavaScript и как определяется его значение?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+this - это специальная переменная в JavaScript, которая указывает на объект
+"контекста", в котором выполняется функция. Значение this зависит от того,
+как функция была вызвана.
+
+ПРАВИЛО: this определяется во время вызова функции, а не при ее определении!
+
+СПОСОБ 1: Вызов как функция (обычный вызов)
+
+function greet() {
+  console.log(this);
+}
+
+greet();  // this указывает на global object (window в браузере, global в Node.js)
+
+В браузере:
+// this = window (глобальный объект)
+
+В Node.js:
+// this = global (глобальный объект)
+
+СПОСОБ 2: Вызов как метод объекта
+
+let person = {
+  name: "Иван",
+  age: 25,
+  greet: function() {
+    console.log("Привет, я " + this.name);
+  }
+};
+
+person.greet();  // this указывает на person
+
+// Выведет: "Привет, я Иван"
+
+ОБЪЯСНЕНИЕ:
+
+Когда вы вызываете person.greet(), JavaScript видит, что вы вызываете метод
+объекта person, поэтому this = person.
+
+Внимание! Если вы передаете метод как отдельную функцию, this изменится:
+
+let greetFunc = person.greet;
+greetFunc();  // this = window (or global), выведет "Привет, я undefined"
+
+СПОСОБ 3: Конструктор (new)
+
+function Person(name) {
+  this.name = name;  // this указывает на новый объект
+}
+
+let ivan = new Person("Иван");
+console.log(ivan.name);  // "Иван"
+
+��БЪЯСНЕНИЕ:
+
+Когда вы используете new, JavaScript создает новый пустой объект и передает его
+как this в функцию. Функция добавляет к нему свойства.
+
+СПОСОБ 4: call() - явно передать this
+
+function introduce(country) {
+  console.log("Я " + this.name + " из " + country);
+}
+
+let person1 = { name: "Иван" };
+let person2 = { name: "Мария" };
+
+introduce.call(person1, "России");   // this = person1
+// Выведет: "Я Иван из России"
+
+introduce.call(person2, "Франции");  // this = person2
+// Выведет: "Я Мария из Франции"
+
+СПОСОБ 5: apply() - похож на call(), но параметры передаются массивом
+
+introduce.apply(person1, ["России"]);   // массив параметров
+introduce.apply(person2, ["Франции"]);
+
+СПОСОБ 6: bind() - создать новую функцию с привязанным this
+
+let greetPerson1 = introduce.bind(person1);
+greetPerson1("России");     // this = person1
+
+let greetPerson2 = introduce.bind(person2);
+greetPerson2("Франции");    // this = person2
+
+Отличие от call и apply:
+• call и apply вызывают функцию сразу
+• bind создает новую функцию, которую вы можете вызвать позже
+
+СПОСОБ 7: Стрелочные функции (특별한 случай)
+
+Стрелочные функции НЕ имеют собственного this!
+Они наследуют this из области видимости, в которой были созданы.
+
+let person = {
+  name: "Иван",
+  greet: function() {
+    console.log(this);  // this = person
+    
+    let arrow = () => {
+      console.log(this);  // this тоже = person (наследовано!)
+    };
+    
+    arrow();
+  }
+};
+
+person.greet();
+// Выведет:
+// { name: "Иван", greet: ... }
+// { name: "Иван", greet: ... }
+
+Это очень полезно в асинхронном коде:
+
+function getData() {
+  this.data = null;
+  
+  fetch('/api/data')
+    .then(response => response.json())
+    .then(data => {
+      this.data = data;  // this = getData(), правильно!
+    });
+}
+
+Если бы вы использовали обычную функцию вместо стрелочной, this был бы window.
+
+ТАБЛИЦА ЗНАЧЕНИЙ THIS:
+
+┌──────────────────────────┬─────────────────────────┐
+│ Способ вызова            │ Значение this           │
+├──────────────────────────┼─────────────────────────┤
+│ func()                   │ window/global           │
+│ obj.method()             │ obj                     │
+│ new Constructor()        │ новый объект            │
+│ func.call(obj, ...)      │ obj                     │
+│ func.apply(obj, [...])   │ obj                     │
+│ func.bind(obj)()         │ obj                     │
+│ () => { ... }            │ из области видимости    │
+└──────────────────────────┴─────────────────────────┘
+
+ЧАСТАЯ ОШИБКА:
+
+let person = {
+  name: "Иван",
+  greet: function() {
+    setTimeout(function() {
+      console.log(this.name);  // this = window, выведет undefined!
+    }, 1000);
+  }
+};
+
+person.greet();
+
+РЕШЕНИЕ - используйте стрелочную функцию:
+
+let person = {
+  name: "Иван",
+  greet: function() {
+    setTimeout(() => {
+      console.log(this.name);  // this = person, выведет "Иван"
+    }, 1000);
+  }
+};
+
+person.greet();
+
+================================================================================
+
+ВОПРОС 4: Что такое прототипы (prototypes) и как работает прототипное наследование?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+Прототип - это объект, который служит шаблоном для создания других объектов.
+Прототипное наследование - это способ передачи свойств и методов от одного
+объекта к другому через цепь прототипов.
+
+В JavaScript каждый объект имеет внутреннюю ссылку на другой объект,
+называемый его прототипом. Если вы пытаетесь получить доступ к свойству,
+которого нет в объекте, JavaScript ищет его в прототипе объекта.
+
+БАЗОВЫЙ ПРИМЕР:
+
+let animal = {
+  sleep: function() {
+    console.log("Zzz...");
+  }
+};
+
+let dog = Object.create(animal);  // dog наследует от animal
+dog.bark = function() {
+  console.log("Woof!");
+};
+
+dog.bark();   // работает (собственное свойство dog)
+dog.sleep();  // работает (наследовано от animal)
+
+ОБЪЯСНЕНИЕ:
+
+1. Мы создаем объект animal с методом sleep
+2. Мы создаем объект dog через Object.create(animal)
+   это означает: dog.__proto__ = animal
+3. dog наследует все методы animal
+4. dog имеет свой метод bark
+5. Когда мы ��ызываем dog.sleep(), JavaScript ищет sleep в dog, не находит,
+   затем ищет в dog.__proto__ (который = animal) и находит!
+
+ЦЕПЬ ПРОТОТИПОВ (Prototype Chain):
+
+Прототипы могут быть связаны в цепь:
+
+let animal = {
+  sleep: function() { console.log("Zzz..."); }
+};
+
+let mammal = Object.create(animal);
+mammal.hasWarmBlood = true;
+
+let dog = Object.create(mammal);
+dog.bark = function() { console.log("Woof!"); };
+
+dog.bark();           // работает (собственное)
+dog.hasWarmBlood;     // true (наследовано от mammal)
+dog.sleep();          // работает (наследовано от animal через mammal)
+
+Цепь: dog → mammal → animal → Object.prototype → null
+
+Когда вы ищете свойство, JavaScript идет вверх по цепи, пока не найдет его
+или не достигнет null.
+
+ФУНКЦИИ-КОНСТРУКТОРЫ И ПРОТОТИПЫ:
+
+Обычно прототипное наследование используется с функциями-конструкторами:
+
+function Animal(name) {
+  this.name = name;
+}
+
+Animal.prototype.sleep = function() {
+  console.log(this.name + " спит");
+};
+
+function Dog(name, breed) {
+  Animal.call(this, name);  // вызываем конструктор Animal для this
+  this.breed = breed;
+}
+
+Dog.prototype = Object.create(Animal.prototype);  // наследование
+Dog.prototype.constructor = Dog;  // исправляем constructor
+
+Dog.prototype.bark = function() {
+  console.log(this.name + " лает");
+};
+
+let myDog = new Dog("Рекс", "Овчарка");
+myDog.bark();     // Рекс лает
+myDog.sleep();    // Рекс спит (наследовано)
+
+ОБЪЯСНЕНИЕ:
+
+1. Animal - функция-конструктор для животных
+2. Dog - функция-конструктор для собак
+3. Dog.prototype = Object.create(Animal.prototype) создает прототипное наследование
+4. Когда мы создаем new Dog(), объект наследует методы и от Dog и от Animal
+
+СВОЙСТВА, СВЯЗАННЫЕ С ПРОТОТИПАМИ:
+
+__proto__ (двойное подчеркивание) - внутренняя ссылка на прототип объекта
+(это техническая ссылка для использования внутри)
+
+let obj = {};
+console.log(obj.__proto__ === Object.prototype);  // true
+
+.prototype (свойство функции) - объект, который будет прототипом для объектов,
+созданных с помощью new
+
+function MyClass() {}
+let instance = new MyClass();
+console.log(instance.__proto__ === MyClass.prototype);  // true
+
+Object.getPrototypeOf() - правильный способ получить прототип объекта
+
+let obj = {};
+console.log(Object.getPrototypeOf(obj) === Object.prototype);  // true
+
+ПРОВЕРКА НАСЛЕДОВАНИЯ:
+
+instanceof - проверить, наследует ли объект от конструктора
+
+let myDog = new Dog("Рекс", "Овчарка");
+console.log(myDog instanceof Dog);     // true
+console.log(myDog instanceof Animal);  // true
+console.log(myDog instanceof Object);  // true
+
+hasOwnProperty() - проверить, является ли свойство собственным
+
+myDog.hasOwnProperty("name");   // true (собственное)
+myDog.hasOwnProperty("sleep");  // false (наследовано)
+
+in оператор - проверить наличие свойства (включая наследованные)
+
+"name" in myDog;    // true
+"sleep" in myDog;   // true
+
+СОВРЕМЕННЫЙ СПОСОБ - КЛАССЫ (ES6):
+
+Классы в современном JavaScript - это синтаксический сахар над прототипами:
+
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  sleep() {
+    console.log(this.name + " спит");
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);  // вызывает конструктор Animal
+    this.breed = breed;
+  }
+  
+  bark() {
+    console.log(this.name + " лает");
+  }
+}
+
+let myDog = new Dog("Рекс", "Овчарка");
+myDog.bark();     // Рекс лает
+myDog.sleep();    // Рекс спит
+
+Под капотом это все еще использует прототипы, но синтаксис более удобный!
+
+================================================================================
+
+ВОПРОС 5: Что такое событие (event) в JavaScript и как работают обработчики событий?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+Событие - это действие, которое происходит на странице (клик, наведение,
+ввод текста и т.д.). Обработчик события - это функция, которая вызывается,
+когда происходит событие.
+
+ОСНОВНЫЕ СОБЫТИЯ:
+
+1. СОБЫТИЯ МЫШИ:
+   • click - клик левой кнопкой мыши
+   • dblclick - двойной клик
+   • mouseover - наведение мыши на элемент
+   • mouseout - мышь уходит с элемента
+   • mousemove - движение мыши
+   • mousedown - нажатие кнопки мыши
+   • mouseup - отпускание кнопки мыши
+
+2. СОБЫТИЯ КЛАВИАТУРЫ:
+   • keydown - нажатие клавиши
+   • keyup - отпускание клавиши
+   • keypress - нажатие символьной клавиши (устарело)
+
+3. СОБЫТИЯ ФОРМЫ:
+   • submit - отправка формы
+   • change - изменение значения input/select/textarea
+   • focus - элемент получил фокус
+   • blur - элемент потерял фокус
+   • input - ввод в input (реагирует на каждый символ)
+
+4. СОБЫТИЯ ДОКУМЕНТА:
+   • load - страница полностью загружена
+   • DOMContentLoaded - DOM полностью загружен (быстрее чем load)
+   • scroll - прокрутка страницы
+   • resize - изменение размера окна
+
+СПОСОБ 1: Атрибут HTML (старый способ, не рекомендуется)
+
+<button onclick="alert('Привет!')">��ажми меня</button>
+
+<button onclick="handleClick()">Нажми меня</button>
+<script>
+  function handleClick() {
+    alert('Привет!');
+  }
+</script>
+
+Проблемы этого подхода:
+• HTML и JavaScript смешаны
+• Одна функция для одного события
+• Сложно добавить несколько обработчиков
+• Сложно удалить обработчик
+
+СПОСОБ 2: Свойство элемента (старый способ, но более гибкий)
+
+let button = document.querySelector("button");
+
+button.onclick = function() {
+  console.log("Кнопка нажата");
+};
+
+Проблемы:
+• Один обработчик перезаписывает другой
+• Сложно добавить несколько обработчиков
+
+СПОСОБ 3: addEventListener (современный способ, РЕКОМЕНДУЕТСЯ)
+
+let button = document.querySelector("button");
+
+button.addEventListener("click", function() {
+  console.log("Кнопка нажата");
+});
+
+button.addEventListener("click", function() {
+  console.log("Второй обработчик");
+});
+
+// Оба обработчика выполнятся
+
+Преимущества:
+• Можно добавить несколько обработчиков для одного события
+• Легко удалить обработчик
+• Можно контролировать фазы события (capturing и bubbling)
+
+УДАЛЕНИЕ ОБРАБОТЧИКА:
+
+let handler = function() {
+  console.log("Клик!");
+};
+
+button.addEventListener("click", handler);
+
+// Позже удаляем обработчик
+button.removeEventListener("click", handler);
+
+Важно: вы должны сохранить ссылку на функцию, чтобы удалить обработчик.
+
+ОБЪЕКТ СОБЫТИЯ (event object):
+
+Функция-обработчик автоматически получает объект события как параметр:
+
+button.addEventListener("click", function(event) {
+  console.log(event);  // объект с информацией о событии
+});
+
+Полезные свойства события:
+
+event.target - элемент, на котором произошло событие
+event.type - тип события ("click", "keydown" и т.д.)
+event.key - для keyboard событий: какая клавиша
+event.code - для keyboard событий: код клавиши
+event.clientX, event.clientY - координ��ты мыши
+event.preventDefault() - отменить действие по умолчанию
+event.stopPropagation() - остановить распространение события
+
+ПРИМЕР: Обработка клика с информацией о событии
+
+button.addEventListener("click", function(event) {
+  console.log("Тип события: " + event.type);      // "click"
+  console.log("Элемент: " + event.target.id);     // id кнопки
+  console.log("X: " + event.clientX + ", Y: " + event.clientY);
+});
+
+ПРИМЕР: Обработка ввода в input
+
+let input = document.querySelector("input");
+
+input.addEventListener("input", function(event) {
+  console.log("Текущее значение: " + event.target.value);
+});
+
+// или можно просто:
+input.addEventListener("input", function(event) {
+  console.log("Текущее значение: " + this.value);
+});
+
+ПРИМЕР: Обработка отправки формы
+
+let form = document.querySelector("form");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();  // отменяем стандартное действие (отправку)
+  console.log("Форма отправлена!");
+  // теперь можно обработать форму своим кодом
+});
+
+ДЕЛЕГИРОВАНИЕ СОБЫТИЙ:
+
+Вместо того чтобы добавлять обработчик каждому элементу списка,
+можно добавить один обработчик к родителю:
+
+HTML:
+<ul id="list">
+  <li><a href="#">Элемент 1</a></li>
+  <li><a href="#">Элемент 2</a></li>
+  <li><a href="#">Элемент 3</a></li>
+</ul>
+
+JavaScript:
+let list = document.querySelector("#list");
+
+list.addEventListener("click", function(event) {
+  if (event.target.tagName === "A") {
+    event.preventDefault();
+    console.log("Клик по ссылке: " + event.target.textContent);
+  }
+});
+
+Преимущества:
+• Один обработчик для многих элементов
+• Работает даже если элементы добавлены позже
+• Экономит память и повышает производительность
+
+ФАЗЫ СОБЫТИЯ (Event Phases):
+
+События проходят три фазы:
+
+1. CAPTURING (захват) - событие идет от document к элементу
+2. TARGET (цель) - событие достигает элемента
+3. BUBBLING (всплытие) - событие идет от элемента к document
+
+Пример:
+
+<div id="parent">
+  <button id="child">Нажми</button>
+</div>
+
+<script>
+  let parent = document.querySelector("#parent");
+  let child = document.querySelector("#child");
+  
+  // Capturing фаза (третий параметр true)
+  parent.addEventListener("click", function() {
+    console.log("Parent capturing");
+  }, true);
+  
+  // Bubbling фаза (третий параметр false или не указан)
+  child.addEventListener("click", function() {
+    console.log("Child");
+  });
+  
+  parent.addEventListener("click", function() {
+    console.log("Parent bubbling");
+  });
+</script>
+
+При клике на кнопку выведет:
+Parent capturing
+Child
+Parent bubbling
+
+Если вызвать event.stopPropagation(), событие не будет распространяться дальше.
+
+================================================================================

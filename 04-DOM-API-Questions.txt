@@ -1,0 +1,580 @@
+================================================================================
+РАЗДЕЛ 4: DOM API
+================================================================================
+
+ВОПРОС 1: Как выбрать элементы из DOM?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+DOM (Document Object Model) - это представление HTML документа в виде дерева объектов.
+Для взаимодействия с элементами на странице нужно их сначала выбрать (найти).
+
+СПОСОБ 1: getElementById - выбрать по id
+
+let element = document.getElementById("myId");
+
+HTML:
+<div id="myId">Привет</div>
+
+JavaScript:
+let element = document.getElementById("myId");
+console.log(element.textContent);  // "Привет"
+
+Особенности:
+• Возвращает один элемент (или null если не найден)
+• Самый быстрый способ поиска
+• id должен быть уникален на странице
+
+СПОСОБ 2: getElementsByClassName - выбрать по классу
+
+let elements = document.getElementsByClassName("myClass");
+
+HTML:
+<div class="myClass">Элемент 1</div>
+<div class="myClass">Элемент 2</div>
+<p class="myClass">Элемент 3</p>
+
+JavaScript:
+let elements = document.getElementsByClassName("myClass");
+console.log(elements.length);  // 3
+
+// Это HTMLCollection (похожа на массив, но не совсем)
+for (let i = 0; i < elements.length; i++) {
+  console.log(elements[i].textContent);
+}
+
+Особенности:
+• Возвращает HTMLCollection (живую коллекцию)
+• Если элементы добавляются после выбора, они автоматически добавятся в коллекцию
+• Медленнее чем getElementById
+
+СПОСОБ 3: getElementsByTagName - выбрать по названию тега
+
+let paragraphs = document.getElementsByTagName("p");
+
+HTML:
+<p>Параграф 1</p>
+<p>Параграф 2</p>
+<div>Это не параграф</div>
+
+JavaScript:
+let paragraphs = document.getElementsByTagName("p");
+console.log(paragraphs.length);  // 2
+
+СПОСОБ 4: querySelector - выбрать по CSS селектору (один элемент)
+
+let element = document.querySelector(".myClass");
+
+или
+
+let element = document.querySelector("#myId");
+
+или
+
+let element = document.querySelector("div p");  // селектор потомка
+
+Особенности:
+• Использует CSS селекторы
+• Возвращает только ПЕРВЫЙ найденный элемент
+• Медленнее, но более гибкий
+• Возвращает null если ничего не найдено
+
+HTML:
+<div class="container">
+  <p class="text">Первый параграф</p>
+  <p class="text">Второй параграф</p>
+</div>
+
+JavaScript:
+let firstParagraph = document.querySelector(".text");
+console.log(firstParagraph.textContent);  // "Первый параграф"
+
+СПОСОБ 5: querySelectorAll - выбрать все элементы по CSS селектору
+
+let elements = document.querySelectorAll(".myClass");
+
+JavaScript:
+let elements = document.querySelectorAll(".text");
+console.log(elements.length);  // 2
+
+// Это NodeList (статичная коллекция, не живая)
+elements.forEach(element => {
+  console.log(element.textContent);
+});
+
+Особенности:
+• Возвращает NodeList (статичную коллекцию)
+• Если элементы добавляются после выбора, они НЕ добавятся в коллекцию
+• Можно использовать forEach
+
+СРАВНЕНИЕ МЕТОДОВ ВЫБОРА:
+
+┌──────────────────────┬─────────────┬───────┬──────────────────┐
+│ Метод                │ Возвращает  │ Живая │ Скорость         │
+├──────────────────────┼─────────────┼───────┼──────────────────┤
+│ getElementById       │ Element     │ нет   │ очень быстро     │
+│ getElementsByClass   │ HTMLCollection│ да   │ быстро           │
+│ getElementsByTag     │ HTMLCollection│ да   │ быстро           │
+│ querySelector        │ Element     │ нет   │ медленнее         │
+│ querySelectorAll     │ NodeList    │ нет   │ медленнее         │
+└──────────────────────┴─────────────┴───────┴──────────────────┘
+
+ПРАКТИЧЕСКИЙ ПРИМЕР:
+
+HTML:
+<form>
+  <input type="text" class="input-field" id="username">
+  <input type="password" class="input-field">
+  <button type="submit">Отправить</button>
+</form>
+
+JavaScript:
+// Выбрать все input'ы
+let inputs = document.querySelectorAll(".input-field");
+
+// Выбрать username
+let usernameInput = document.getElementById("username");
+
+// Выбрать форму
+let form = document.querySelector("form");
+
+// Выбрать кнопку
+let button = document.querySelector("button");
+
+================================================================================
+
+ВОПРОС 2: Как изменять содержимое и атрибуты элементов?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+После того как вы выбрали элемент, вы можете изменить его содержимое,
+атрибуты и стили.
+
+ИЗМЕНЕНИЕ ТЕКСТА И HTML:
+
+1. textContent - изменить текстовое содержимое
+
+let div = document.querySelector("div");
+div.textContent = "Новый текст";
+
+HTML до:
+<div>Старый текст</div>
+
+HTML после:
+<div>Новый текст</div>
+
+Особенность: textContent игнорирует HTML теги и просто вставляет текст.
+
+let div = document.querySelector("div");
+div.textContent = "<b>Жирный текст</b>";  // выведет буквально "<b>Жирный текст</b>"
+
+2. innerHTML - изменить HTML содержимое
+
+let div = document.querySelector("div");
+div.innerHTML = "<b>Жирный текст</b>";
+
+HTML после:
+<div><b>Жирный текст</b></div>
+
+Особенность: innerHTML парсит HTML и создает элементы.
+
+ВНИМАНИЕ: innerHTML небезопасен если содержимое приходит от пользователя!
+Используйте textContent для пользовательского содержимого.
+
+3. innerText - похож на textContent, но чувствителен к стилям
+
+Используйте textContent, он работает быстрее.
+
+ИЗМЕНЕНИЕ АТРИБУТОВ:
+
+1. setAttribute - установить атрибут
+
+let link = document.querySelector("a");
+link.setAttribute("href", "https://google.com");
+link.setAttribute("target", "_blank");
+
+HTML результат:
+<a href="https://google.com" target="_blank">...</a>
+
+2. getAttribute - получить значение атрибута
+
+let link = document.querySelector("a");
+let href = link.getAttribute("href");
+console.log(href);  // значение href
+
+3. removeAttribute - удалить атрибут
+
+let link = document.querySelector("a");
+link.removeAttribute("target");
+
+4. Прямое свойство элемента (проще)
+
+let input = document.querySelector("input");
+input.value = "Текст по умолчанию";
+
+let img = document.querySelector("img");
+img.src = "image.jpg";
+img.alt = "Описание изображения";
+
+let link = document.querySelector("a");
+link.href = "https://google.com";
+
+РАБОТА С КЛАССАМИ:
+
+1. classList.add - добавить класс
+
+let div = document.querySelector("div");
+div.classList.add("active");
+
+HTML до:
+<div></div>
+
+HTML после:
+<div class="active"></div>
+
+2. classList.remove - удалить класс
+
+div.classList.remove("active");
+
+3. classList.toggle - добавить если нет, удалить если есть
+
+div.classList.toggle("active");
+
+// Первый раз: класс добавится
+// Второй раз: класс удалится
+// Третий раз: класс добавится
+// И так далее...
+
+4. classList.contains - проверить наличие класса
+
+if (div.classList.contains("active")) {
+  console.log("Элемент активен");
+}
+
+5. className - заменить все классы (старый способ, не рекомендуется)
+
+div.className = "new-class";  // удалит все старые классы!
+
+// Лучше использовать classList
+
+ИЗМЕНЕНИЕ СТИЛЕЙ:
+
+1. style свойство - изменить встроенные стили
+
+let div = document.querySelector("div");
+div.style.color = "red";
+div.style.backgroundColor = "yellow";
+div.style.fontSize = "20px";
+div.style.padding = "10px";
+
+HTML результат:
+<div style="color: red; background-color: yellow; font-size: 20px; padding: 10px;">
+  ...
+</div>
+
+Особенность: CSS свойства с дефисом пишутся в camelCase
+CSS: background-color → JavaScript: backgroundColor
+CSS: font-size → JavaScript: fontSize
+
+2. cssText - заменить все стили сразу
+
+div.style.cssText = "color: red; background-color: yellow; font-size: 20px;";
+
+3. Использовать classList с CSS классами (рекомендуется)
+
+CSS:
+.active {
+  color: red;
+  background-color: yellow;
+  font-size: 20px;
+}
+
+JavaScript:
+let div = document.querySelector("div");
+div.classList.add("active");
+
+Это лучше, так как с��или хранятся в CSS, а JavaScript только управляет классами.
+
+ПРАКТИЧЕСКИЙ ПРИМЕР:
+
+HTML:
+<button id="myButton">Нажми меня</button>
+
+JavaScript:
+let button = document.getElementById("myButton");
+
+// Изменить текст
+button.textContent = "Новый текст";
+
+// Добавить класс
+button.classList.add("primary");
+
+// Добавить атрибут
+button.setAttribute("data-action", "click");
+
+// Изменить стиль
+button.style.padding = "10px 20px";
+button.style.backgroundColor = "blue";
+button.style.color = "white";
+
+// или через classList (лучше):
+button.classList.add("btn-primary");
+
+================================================================================
+
+ВОПРОС 3: Как создавать и удалять элементы в DOM?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+Часто нужно не только изменять существующие элементы, но и создавать новые
+или удалять старые.
+
+СОЗДАНИЕ ЭЛЕМЕНТА:
+
+document.createElement - создать новый элемент
+
+let newDiv = document.createElement("div");
+newDiv.textContent = "Я новый элемент";
+newDiv.className = "box";
+
+console.log(newDiv);  // вывдет элемент, но он еще не на странице!
+
+ДОБАВЛЕНИЕ ЭЛЕМЕНТА НА СТРАНИЦУ:
+
+1. appendChild - добавить элемент в конец
+
+let container = document.querySelector(".container");
+let newDiv = document.createElement("div");
+newDiv.textContent = "Новый элемент";
+
+container.appendChild(newDiv);
+
+HTML до:
+<div class="container">
+  <p>Существующий элемент</p>
+</div>
+
+HTML после:
+<div class="container">
+  <p>Существующий элемент</p>
+  <div>Новый элемент</div>
+</div>
+
+2. insertBefore - вставить элемент перед другим
+
+let container = document.querySelector(".container");
+let newDiv = document.createElement("div");
+newDiv.textContent = "Новый элемент";
+
+let firstChild = container.firstChild;  // первый потомок
+container.insertBefore(newDiv, firstChild);
+
+HTML до:
+<div class="container">
+  <p>Существующий элемент</p>
+</div>
+
+HTML после:
+<div class="container">
+  <div>Новый элемент</div>
+  <p>Существующий элемент</p>
+</div>
+
+3. insertAdjacentHTML - вставить HTML относительно элемента
+
+let div = document.querySelector("div");
+
+div.insertAdjacentHTML("beforebegin", "<p>До элемента</p>");
+div.insertAdjacentHTML("afterbegin", "<p>В начало элемента</p>");
+div.insertAdjacentHTML("beforeend", "<p>В конец элемента</p>");
+div.insertAdjacentHTML("afterend", "<p>После элемента</p>");
+
+Результат:
+<p>До элемента</p>
+<div>
+  <p>В начало элемента</p>
+  Содержимое div
+  <p>В конец элемента</p>
+</div>
+<p>После элемента</p>
+
+УДАЛЕНИЕ ЭЛЕМЕНТА:
+
+1. removeChild - удалить элемент через родителя
+
+let container = document.querySelector(".container");
+let div = document.querySelector("div");
+
+container.removeChild(div);
+
+2. remove - удалить элемент напрямую (современный способ)
+
+let div = document.querySelector("div");
+div.remove();  // просто удаляет элемент
+
+Это удобнее, чем removeChild, но не поддерживается в очень старых браузерах.
+
+ПОЛНЫЙ ПРИМЕР: Создание списка задач
+
+HTML:
+<div class="todo-list"></div>
+<input type="text" id="taskInput">
+<button id="addBtn">Добавить задачу</button>
+
+CSS:
+.todo-list {
+  margin-top: 20px;
+}
+
+.task {
+  padding: 10px;
+  background: #f0f0f0;
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+JavaScript:
+let addBtn = document.getElementById("addBtn");
+let taskInput = document.getElementById("taskInput");
+let todoList = document.querySelector(".todo-list");
+
+addBtn.addEventListener("click", function() {
+  let taskText = taskInput.value;
+  
+  if (taskText.trim() === "") return;  // ничего не добавляем если пусто
+  
+  // Создаем элемент задачи
+  let taskDiv = document.createElement("div");
+  taskDiv.className = "task";
+  
+  // Создаем текст задачи
+  let taskSpan = document.createElement("span");
+  taskSpan.textContent = taskText;
+  
+  // Создаем кнопку удаления
+  let deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.textContent = "Удалить";
+  
+  // Обработчик клика на кнопку удаления
+  deleteBtn.addEventListener("click", function() {
+    taskDiv.remove();  // удаляем задачу
+  });
+  
+  // Доба��ляем текст и кнопку в taskDiv
+  taskDiv.appendChild(taskSpan);
+  taskDiv.appendChild(deleteBtn);
+  
+  // Добавляем задачу в список
+  todoList.appendChild(taskDiv);
+  
+  // Очищаем input
+  taskInput.value = "";
+});
+
+================================================================================
+
+ВОПРОС 4: Что такое события и как с ними работать?
+────────────────────────────────────────────────────────────────────────────────
+
+ОТВЕТ:
+
+События - это действия, которые происходят на странице (клик, наведение,
+ввод текста и т.д.). Мы можем "слушать" эти события и выполнять код
+когда они происходят.
+
+(см. подробное описание в разделе JavaScript Основы, вопрос 5)
+
+Здесь дополнительная информация:
+
+ДЕЛЕГИРОВАНИЕ СОБЫТИЙ - рекомендуемый подход:
+
+Вместо добавления обработчика каждому элементу списка, добавляем один
+обработчик к родителю:
+
+HTML:
+<ul id="items">
+  <li>Элемент 1</li>
+  <li>Элемент 2</li>
+  <li>Элемент 3</li>
+</ul>
+
+JavaScript (неправильный способ - много обработчиков):
+let items = document.querySelectorAll("li");
+items.forEach(item => {
+  item.addEventListener("click", function() {
+    console.log("Клик: " + this.textContent);
+  });
+});
+
+Проблемы: если добавить новый li, обработчик не добавится автоматически.
+
+JavaScript (правильный способ - делегирование):
+let list = document.getElementById("items");
+
+list.addEventListener("click", function(event) {
+  if (event.target.tagName === "LI") {
+    console.log("Клик: " + event.target.textContent);
+  }
+});
+
+Преимущества: один обработчик для всех элементов, даже добавленных позже.
+
+ПРЕДОТВРАЩЕНИЕ ДЕЙСТВИЙ ПО УМОЛЧАНИЮ:
+
+Некоторые события имеют действие по умолчанию (например, ссылка переходит по href).
+
+HTML:
+<a href="https://google.com" id="link">Google</a>
+
+JavaScript (без preventDefault):
+let link = document.getElementById("link");
+link.addEventListener("click", function() {
+  console.log("Клик!");
+  // но ссылка все равно будет работать и перейдет на Google
+});
+
+JavaScript (с preventDefault):
+let link = document.getElementById("link");
+link.addEventListener("click", function(event) {
+  event.preventDefault();  // отменяем переход по ссылке
+  console.log("Клик! Перехода не будет");
+});
+
+ОСТАНОВКА РАСПРОСТРАНЕНИЯ СОБЫТИЯ:
+
+event.stopPropagation() предотвращает распространение события дальше:
+
+HTML:
+<div id="parent">
+  <button id="btn">Кнопка</button>
+</div>
+
+JavaScript:
+let parent = document.getElementById("parent");
+let btn = document.getElementById("btn");
+
+parent.addEventListener("click", function() {
+  console.log("Клик на parent");
+});
+
+btn.addEventListener("click", function(event) {
+  console.log("Клик на button");
+  event.stopPropagation();  // событие не дойдет до parent
+});
+
+При клике на кнопку выведет только "Клик на button".
+
+================================================================================

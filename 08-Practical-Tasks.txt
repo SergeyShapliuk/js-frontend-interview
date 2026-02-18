@@ -1,0 +1,479 @@
+================================================================================
+РАЗДЕЛ 8: ПРАКТИЧЕСКИЕ ЗАДАЧИ И АЛГОРИТМЫ
+================================================================================
+
+ЗАДАЧА 1: Реализовать счетчик с кнопками
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать компонент счетчика, который:
+• Показывает текущее число (начиная с 0)
+• Имеет кнопку "Увеличить" (прибавляет 1)
+• Имеет кнопку "Уменьшить" (вычитает 1)
+• Имеет кнопку "Сброс" (возвращает на 0)
+• Блокирует кнопку "Уменьшить" если счетчик = 0
+
+РЕШЕНИЕ:
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  
+  const increment = () => setCount(count + 1);
+  const decrement = () => {
+    if (count > 0) {
+      setCount(count - 1);
+    }
+  };
+  const reset = () => setCount(0);
+  
+  return (
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h1>Счетчик: {count}</h1>
+      
+      <button onClick={increment} style={{ margin: "5px" }}>
+        Увеличить
+      </button>
+      
+      <button 
+        onClick={decrement}
+        disabled={count === 0}
+        style={{ margin: "5px" }}
+      >
+        Уменьшить
+      </button>
+      
+      <button onClick={reset} style={{ margin: "5px" }}>
+        Сброс
+      </button>
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. useState(0) создает состояние счетчика с начальным значением 0
+2. Три функции изменяют состояние
+3. disabled={count === 0} отключает кнопку когда count = 0
+4. onClick={increment} вызывает функцию при клике
+
+================================================================================
+
+ЗАДАЧА 2: Поле поиска с фильтром по массиву
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать компонент с:
+• Input полем для ввода поиска
+• Списком данных (например, пользователей)
+• Фильтром, который ищет по имени в реальном времени
+• Сообщение "Ничего не найдено" если результатов нет
+
+РЕШЕНИЕ:
+
+function SearchableList() {
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const users = [
+    { id: 1, name: "Иван Петров" },
+    { id: 2, name: "Мария Смирнова" },
+    { id: 3, name: "Петр Иванов" },
+    { id: 4, name: "Анна Сидорова" },
+    { id: 5, name: "Иван Сергеев" }
+  ];
+  
+  // Фильтруем пользователей по поисковому запросу
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Поиск пользователей</h2>
+      
+      <input
+        type="text"
+        placeholder="Введите имя..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        style={{ 
+          padding: "10px", 
+          fontSize: "16px",
+          width: "300px"
+        }}
+      />
+      
+      {filteredUsers.length > 0 ? (
+        <ul style={{ marginTop: "20px", listStyle: "none" }}>
+          {filteredUsers.map(user => (
+            <li 
+              key={user.id}
+              style={{ 
+                padding: "10px",
+                backgroundColor: "#f0f0f0",
+                marginBottom: "5px",
+                borderRadius: "4px"
+              }}
+            >
+              {user.name}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p style={{ color: "red", marginTop: "20px" }}>
+          Ничего не найдено
+        </p>
+      )}
+      
+      <p style={{ marginTop: "20px", color: "#666" }}>
+        Найдено: {filteredUsers.length} результат(ов)
+      </p>
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. searchQuery сохраняет текущий поисковый запрос
+2. setSearchQuery обновляется при вводе в input
+3. filter() создает новый массив с только подходящими пользователями
+4. toLowerCase() для нечувствительного к регистру поиска
+5. Условный рендеринг: показываем результаты или "Ничего не найдено"
+
+================================================================================
+
+ЗАДАЧА 3: Форма регистрации с валидацией
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать форму с:
+• Поле для имени (обязательное)
+• Поле для email (обязательное, должен быть валидный email)
+• Поле для пароля (обязательное, минимум 6 символов)
+• Кнопка отправки
+• Показывает ошибки валидации в красном цвете
+
+РЕШЕНИЕ:
+
+function RegistrationForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  
+  // Валидация email
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  
+  // Валидация формы
+  const validateForm = () => {
+    let newErrors = {};
+    
+    if (!name.trim()) {
+      newErrors.name = "Имя обязательно";
+    }
+    
+    if (!email.trim()) {
+      newErrors.email = "Email обязателен";
+    } else if (!isValidEmail(email)) {
+      newErrors.email = "Email некорректен";
+    }
+    
+    if (!password) {
+      newErrors.password = "Пароль обязателен";
+    } else if (password.length < 6) {
+      newErrors.password = "Пароль должен быть не менее 6 символов";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  // Обработка отправки формы
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      console.log("Форма отправлена:", { name, email, password });
+      setSubmitted(true);
+      // Очищае�� форму
+      setName("");
+      setEmail("");
+      setPassword("");
+      
+      setTimeout(() => setSubmitted(false), 3000);
+    }
+  };
+  
+  return (
+    <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
+      <h2>Регистрация</h2>
+      
+      {submitted && (
+        <div style={{ 
+          backgroundColor: "#d4edda",
+          color: "#155724",
+          padding: "10px",
+          borderRadius: "4px",
+          marginBottom: "20px"
+        }}>
+          Успешно зарегистрированы!
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>
+            Имя:
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{ 
+              width: "100%",
+              padding: "8px",
+              borderColor: errors.name ? "red" : "#ccc",
+              border: "1px solid",
+              borderRadius: "4px"
+            }}
+          />
+          {errors.name && (
+            <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0 0" }}>
+              {errors.name}
+            </p>
+          )}
+        </div>
+        
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>
+            Email:
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ 
+              width: "100%",
+              padding: "8px",
+              borderColor: errors.email ? "red" : "#ccc",
+              border: "1px solid",
+              borderRadius: "4px"
+            }}
+          />
+          {errors.email && (
+            <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0 0" }}>
+              {errors.email}
+            </p>
+          )}
+        </div>
+        
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>
+            Пароль:
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ 
+              width: "100%",
+              padding: "8px",
+              borderColor: errors.password ? "red" : "#ccc",
+              border: "1px solid",
+              borderRadius: "4px"
+            }}
+          />
+          {errors.password && (
+            <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0 0" }}>
+              {errors.password}
+            </p>
+          )}
+        </div>
+        
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            padding: "10px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "16px"
+          }}
+        >
+          Зарегистрироваться
+        </button>
+      </form>
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. Три состояния для полей формы (name, email, password)
+2. errors объект хранит ошибки валидации
+3. isValidEmail функция проверяет формат email (регулярное выражение)
+4. validateForm проверяет все поля перед отправкой
+5. handleSubmit предотвращает стандартное действие (e.preventDefault())
+6. Условный рендеринг для отображения ошибок
+
+================================================================================
+
+ЗАДАЧА 4: Меню с вкладками (Tabs)
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать компонент с:
+• Несколько вкладок (кнопки для переключения)
+• При клике на вкладку показывается соответствующий контент
+• Активная вкладка выделена
+
+РЕШЕНИЕ:
+
+function TabsComponent() {
+  const [activeTab, setActiveTab] = useState("tab1");
+  
+  const tabs = [
+    {
+      id: "tab1",
+      label: "Описание",
+      content: "Это вкладка с описанием продукта"
+    },
+    {
+      id: "tab2",
+      label: "Характеристики",
+      content: "Характеристики: процессор Intel, RAM 16GB, SSD 512GB"
+    },
+    {
+      id: "tab3",
+      label: "Отзывы",
+      content: "Отзывы: Отличный продукт! Быстрый, надежный"
+    }
+  ];
+  
+  return (
+    <div style={{ padding: "20px", maxWidth: "600px" }}>
+      <h2>Вкладки</h2>
+      
+      {/* Кнопки вкладок */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: activeTab === tab.id ? "#007bff" : "#e9ecef",
+              color: activeTab === tab.id ? "white" : "black",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "16px"
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      
+      {/* Содержимое активной вкладки */}
+      <div style={{
+        padding: "20px",
+        backgroundColor: "#f0f0f0",
+        borderRadius: "4px",
+        minHeight: "100px"
+      }}>
+        {tabs.find(tab => tab.id === activeTab)?.content}
+      </div>
+    </div>
+  );
+}
+
+ОБЪЯСНЕНИЕ:
+
+1. activeTab хранит ID активной вкладки
+2. map() создает кнопку для каждой вкладки
+3. Условная стилизация: activeTab === tab.id ? активный стиль : неактивный
+4. onClick={() => setActiveTab(tab.id)} переключает вкладку
+5. find() находит и отображает содержимое активной вкладки
+
+================================================================================
+
+ЗАДАЧА 5: Список задач (To-Do List) с удалением и отметкой
+────────────────────────────────────────────────────────────────────────────────
+
+ЗАДАНИЕ:
+
+Создать компонент с:
+• Поле для ввода новой задачи
+• Кнопка "Добавить"
+• Список задач с чекбоксом для отметки выполненной
+• Кнопка удаления для каждой задачи
+• Счетчик выполненных задач
+
+РЕШЕНИЕ:
+
+function TodoList() {
+  const [tasks, setTasks] = useState([]);
+  const [input, setInput] = useState("");
+  
+  // Добавить задачу
+  const addTask = () => {
+    if (input.trim() === "") return;
+    
+    const newTask = {
+      id: Date.now(),  // простой способ создать уникальный ID
+      text: input,
+      completed: false
+    };
+    
+    setTasks([...tasks, newTask]);
+    setInput("");  // очистить input
+  };
+  
+  // Удалить задачу
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+  
+  // Отметить задачу как выполненную
+  const toggleTask = (id) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+  
+  // Подсчитать выполненные задачи
+  const completedCount = tasks.filter(task => task.completed).length;
+  
+  return (
+    <div style={{ maxWidth: "500px", margin: "0 auto", padding: "20px" }}>
+      <h2>Мой список задач</h2>
+      
+      {/* Ввод новой задачи */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") addTask();
+          }}
+          placeholder="Добавить новую задачу..."
+          style={{
+            flex: 1,
+            padding: "10px",
+            fontSize: "16px",
+            border: "1px solid #ccc",
+            borderRadius: "4px"
+          }}
+        />
+        
